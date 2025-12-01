@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<body style="position: fixed;">
+<div id="game">
+    <img src="assets/man.jpg" id="player" style="position: relative; width:250px; height:250px; bottom: 700px; z-index: 9999;">
+    <img src="assets/map.jpg" id="map" style="rotate: 90deg; position: relative; bottom: 265px; right: 36px; z-index: 1;"> 
+    <link rel="stylesheet" href="assets/trash.css">  
+
+    <img src="assets/trash.jpg" id="trash1a" class="trash" style="left: 250px;">
+    <img src="assets/trash.jpg" id="trash1b" class="trash">
+    <img src="assets/trash.jpg" id="trash2a" class="trash" style="left: 85px;">
+    <img src="assets/trash.jpg" id="trash2b" class="trash" style="right: 150px;">
+    <img src="assets/trash.jpg" id="trash3a" class="trash" style="right: 100px;">
+    <img src="assets/trash.jpg" id="trash3b" class="trash" style="left: 925px; bottom: 1900px;">  
+</div>
+
+<div id="title" style="visibility: hidden;">
+    <img src="assets/click.png" id="click" style="position: relative;">
+    <img src="assets/title.gif" id="title_logo" style="position: relative; bottom: 1800px;">
+</div>
+
+</body>
+<script src="assets/fog.js"></script>
+</html>
+
+<script>
+const main = new Audio('assets/audio.mp3');
+function game_loop() {
+    document.getElementById("game").style.visibility = "visible"
+    const player = document.getElementById("player");
+    const map = document.getElementById("map");
+    map.style.height = screen.width + ("px");
+    map.style.width = screen.height + ("px");
+    //const trash = ["trash1a", "trash1b", "trash2a", "trash2b", "trash3a", "trash3b"];
+    let trashStates = {
+        "trash1a": false,
+        "trash1b": false,
+        "trash2a": false,
+        "trash2b": false,
+        "trash3a": false,
+        "trash3b": false
+    };
+    let clock = 0;
+
+    document.addEventListener("keypress", function(event) {
+        if (event.keyCode == 100 && position < 3) {
+            position = position + parseInt(1)
+        }
+        if (event.keyCode == 97 && position > 1) {
+            position = position - parseInt(1)
+        }
+    });
+
+    setInterval(() => {
+        // Handle player movement
+        if (position == parseInt(1) || position < parseInt(1)) {
+            player.style.left = "250px";
+        }
+        if (position == parseInt(2)) {
+            player.style.left = "600px";
+        }
+        if (position == parseInt(3) || position > parseInt(3)) {
+            player.style.left = "900px";
+        }
+
+        // Check for collision (you can implement this in `iscol_multi` function)
+        if (iscol_multi("player", trash)) {
+            return true
+        }
+    
+    }, 1);
+
+    setInterval(() => {
+        let trash = document.createElement("img")
+        trash.setAttribute(src, "assets/trash.png")
+        document.appendChild(trash)
+    }, 500);
+
+   /* setInterval(() => {
+        // Random trash movement every 3 seconds
+        let random = Math.floor(Math.random() * 6);
+        let trashId = trash[random];
+        if (!trashStates[trashId]) {
+            move(trashId);
+            trashStates[trashId] = true;
+        }
+    }, 3000); // 3 seconds
+
+    function move(id) {
+        document.getElementById(id).style.visibility = "visible"
+        var trash = document.getElementById(id);
+        var compute = window.getComputedStyle(trash);
+        var trashBottom = parseInt(compute.getPropertyValue("bottom"));
+        var time = 1300;
+
+        let trashInterval = setInterval(() => {
+            trash.style.bottom = trashBottom + "px";
+            trashBottom -= 1;
+            time -= 1;
+
+            if (time < 1) {
+                clearInterval(trashInterval);
+                trashStates[id] = false;
+
+                if (id == "trash3b") {
+                    trash.style.bottom = "1900px";
+                } else {
+                    trash.style.bottom = "1650px";
+                }
+                document.getElementById(id).style.visibility = "hidden"
+            }
+        }, 5); 
+    }*/
+
+}
+
+function title_screen(){
+    document.getElementById("title").style.visibility = "visible"
+    var click = document.getElementById("click")
+    var title = document.getElementById("title_logo")
+    click.style.width = screen.width + "px"
+    click.style.height = screen.height + "px"
+    click.style.bottom = ((screen.height)+850) + "px"
+    title.style.width = screen.width  + "px"
+    title.style.height = (screen.height)-100 + "px"
+
+    click.addEventListener("click",function(event){
+        main.play()
+        click.style.visibility = ("hidden")
+        title.style.visibility = ("visible")
+        title.style.bottom = ((screen.width)*2)-80 + "px"
+        title.style.left = "-8px"
+        document.addEventListener("keydown",function(event){
+            title.style.visibility = ("hidden")
+            game_loop()
+        })
+    })
+}
+
+function ip() {
+    let city = null //city
+    let state = null //regionName
+    let country = null //country
+    let ip = null //quary
+    let lat = null //lat
+    let long = null //lon
+    fetch("http://ip-api.com/json")
+    .then(res => res.json())
+    .then(data => {
+        city = data.city
+        state = data.regionName
+        country = data.country
+        lat = data.lat
+        long = data.lon
+    })
+    fetch("https://api.ipify.org?format=json")
+    .then(res => res.json())
+    .then(data => {
+        ip = data.ip
+    })
+    setTimeout(() => {
+        alert("You are current at: " + lat + ", " + long + ", you currenty live in: " + city + " " + state + " in the " + country + ", and your ip address is: " + ip)
+    }, 500)
+}
+let position = 2;
+title_screen()
+
+
+window.onerror = function error() {
+    alert("JS error")
+}
+</script>
